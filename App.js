@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   KeyboardAvoidingView,
+  SafeAreaView,
   Text,
   View,
   TextInput,
@@ -23,7 +24,10 @@ import {
 
 export default function App() {
   const [input, setInput] = useState("");
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState([
+    { username: "kpose", text: "we in" },
+    { username: "3d", text: "whats up" },
+  ]);
   const [username, setUsername] = useState("");
   const [inputVal, setInputVal] = useState("");
   const [isDialogVisible, setIsDialogVisible] = useState(false);
@@ -33,7 +37,7 @@ export default function App() {
   }, []);
 
   const sendMessage = () => {
-    setMessages([...messages, input]);
+    setMessages([...messages, { username: username, text: input }]);
     setInput("");
   };
 
@@ -44,7 +48,13 @@ export default function App() {
   };
 
   const renderMessages = () => {
-    return messages.map((message) => <Message text={message} />);
+    return messages.map((message) => (
+      <Message
+        key={message.username}
+        username={message.username}
+        text={message.text}
+      />
+    ));
   };
 
   const usernameDialog = () => {
@@ -54,6 +64,7 @@ export default function App() {
           <Dialog
             visible={isDialogVisible}
             onDismiss={() => setIsDialogVisible(false)}
+            style={{ borderRadius: 40, backgroundColor: "#4278c9" }}
           >
             <Dialog.Title>Enter Username</Dialog.Title>
             <Dialog.Content>
@@ -61,6 +72,7 @@ export default function App() {
                 value={inputVal}
                 onChangeText={(text) => setInputVal(text)}
                 onSubmitEditing={sendUser}
+                style={{ backgroundColor: "#3b3d40s" }}
               />
             </Dialog.Content>
             <Dialog.Actions>
@@ -75,13 +87,11 @@ export default function App() {
   return (
     <>
       <Provider>
-        <View style={styles.messageContainer}>
+        <SafeAreaView style={styles.messageContainer}>
           <StatusBar barStyle="dark-content" />
-          <Text>messages</Text>
-          <Text> username is : {username}</Text>
           {renderMessages()}
           {usernameDialog()}
-        </View>
+        </SafeAreaView>
 
         <KeyboardAvoidingView behavior="padding" style={styles.senderContainer}>
           <TextInput
@@ -106,8 +116,8 @@ const styles = StyleSheet.create({
     flex: 0.9,
     flexDirection: "column",
     backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
+    //alignItems: "center",
+    //justifyContent: "center",
   },
   senderContainer: {
     flex: 0.1,
