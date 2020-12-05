@@ -49,11 +49,7 @@ export default function App() {
 
   const renderMessages = () => {
     return messages.map((message) => (
-      <Message
-        key={message.username}
-        username={message.username}
-        text={message.text}
-      />
+      <Message key={message.username} username={username} message={message} />
     ));
   };
 
