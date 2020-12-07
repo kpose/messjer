@@ -8,10 +8,12 @@ import {
   View,
   TextInput,
   Button,
+  ScrollView,
   Alert,
 } from "react-native";
 import Message from "./src/components/Message";
-
+import db from "./src/firebase";
+import firebase from "firebase";
 import {
   Button as ButtonPaper,
   Paragraph,
@@ -22,22 +24,33 @@ import {
 } from "react-native-paper";
 //import Icon from 'react-native-vector-icons/FontAwesome';
 
-export default function App() {
+const App = () => {
   const [input, setInput] = useState("");
-  const [messages, setMessages] = useState([
-    { username: "kpose", text: "we in" },
-    { username: "3d", text: "whats up" },
-  ]);
+  const [messages, setMessages] = useState([]);
   const [username, setUsername] = useState("");
   const [inputVal, setInputVal] = useState("");
   const [isDialogVisible, setIsDialogVisible] = useState(false);
+  console.log(messages);
+
+  useEffect(() => {
+    db.collection("messages")
+      .orderBy("timestamp")
+      .onSnapshot((snapshot) => {
+        setMessages(snapshot.docs.map((doc) => doc.data()));
+      });
+  }, []);
 
   useEffect(() => {
     setIsDialogVisible(true);
   }, []);
 
   const sendMessage = () => {
-    setMessages([...messages, { username: username, text: input }]);
+    db.collection("messages").add({
+      message: input,
+      username: username,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+
     setInput("");
   };
 
@@ -49,7 +62,7 @@ export default function App() {
 
   const renderMessages = () => {
     return messages.map((message) => (
-      <Message key={message.username} username={username} message={message} />
+      <Message key={message.message} username={username} message={message} />
     ));
   };
 
@@ -83,11 +96,13 @@ export default function App() {
   return (
     <>
       <Provider>
-        <SafeAreaView style={styles.messageContainer}>
-          <StatusBar barStyle="dark-content" />
-          {renderMessages()}
-          {usernameDialog()}
-        </SafeAreaView>
+        <ScrollView>
+          <SafeAreaView style={styles.messageContainer}>
+            <StatusBar barStyle="dark-content" />
+            {renderMessages()}
+            {usernameDialog()}
+          </SafeAreaView>
+        </ScrollView>
 
         <KeyboardAvoidingView behavior="padding" style={styles.senderContainer}>
           <TextInput
@@ -105,18 +120,20 @@ export default function App() {
       </Provider>
     </>
   );
-}
+};
+
+export default App;
 
 const styles = StyleSheet.create({
   messageContainer: {
-    flex: 0.9,
+    flex: 0.8,
     flexDirection: "column",
     backgroundColor: "#fff",
     //alignItems: "center",
     //justifyContent: "center",
   },
   senderContainer: {
-    flex: 0.1,
+    flex: 0.2,
     flexDirection: "row",
     backgroundColor: "#fff",
     alignItems: "center",
