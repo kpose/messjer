@@ -10,7 +10,7 @@ import { Card, Title, Paragraph } from "react-native-paper";
 
 const windowWidth = Dimensions.get("window").width;
 
-function Message({ message, username }) {
+const Message = ({ message, username }) => {
   const isUser = username === message.username;
 
   return (
@@ -33,7 +33,7 @@ function Message({ message, username }) {
       </Card.Content>
     </Card>
   );
-}
+};
 
 export default Message;
 
